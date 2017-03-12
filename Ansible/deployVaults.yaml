@@ -1,0 +1,11 @@
+---
+- hosts: vaultservers
+  remote_user: dominic
+
+  tasks:
+  - name: Ping hosts 
+    ping:
+    register: output
+
+  - name: Show stuff
+    debug: var=output
