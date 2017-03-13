@@ -1,11 +1,37 @@
 ---
-- hosts: vaultservers
+- hosts: vaultdevservers
   remote_user: dominic
+  connection: ssh
+
+  vars:
+    local_home: "{{ lookup('env','HOME') }}"
 
   tasks:
-  - name: Ping hosts 
-    ping:
+  - name: Install packages
+    apt:
+      pkg: git
+      update_cache: yes
+      state: latest
+    sudo: yes
+
+  - name: Get repo from github
+    git:
+      repo: https://github.com/DominicSina/VaultServer.git
+      dest: /home/dominic/VaultServer
+
+  # Only available to a registered user, not useful for following ansible shell module.
+  # Still nice to have for local debugging on the target machines.
+  - name: Add vault binary to PATH 
+    lineinfile:
+      dest: ~/.bashrc
+      line: 'export PATH="$PATH:$HOME/VaultServer/Vault" # Adds vault binary to PATH'
+
+  - name: start vault server
+    #shell: /home/dominic/VaultServer/Vault/vault server -dev & #doesnt work but other forks might work
+    shell: /home/dominic/VaultServer/Vault/vault server -dev
+    async: 60 #insert large number, VERY UGLY but https://github.com/ansible/ansible/issues/4778 suggests this
+    poll: 0
     register: output
 
-  - name: Show stuff
+  - name: Show output
     debug: var=output
