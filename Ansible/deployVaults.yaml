@@ -26,12 +26,31 @@
       dest: ~/.bashrc
       line: 'export PATH="$PATH:$HOME/VaultServer/Vault" # Adds vault binary to PATH'
 
+  # Similar to task above. Specifies to access local vault server through http using bash.
+  - name: Set local vault server to be accessed through http
+    lineinfile:
+      dest: ~/.bashrc
+      line: 'export VAULT_ADDR="http://127.0.0.1:8200" # Adds local vault server address to bash'
+
+  # Used to start server on linux systems. Memlocks should be turned on when
+  # nonencrypted swaps are performed https://www.vaultproject.io/docs/configuration/index.html 
+  - name: Enable memlock syscall for vault 
+    shell: setcap cap_ipc_lock=+ep $(readlink -f $(which vault))
+    sudo: yes
+
   - name: start vault server
     #shell: /home/dominic/VaultServer/Vault/vault server -dev & #doesnt work but other forks might work
-    shell: /home/dominic/VaultServer/Vault/vault server -dev
+    shell: /home/dominic/VaultServer/Vault/vault server config=config.hcl
     async: 60 #insert large number, VERY UGLY but https://github.com/ansible/ansible/issues/4778 suggests this
     poll: 0
     register: output
 
   - name: Show output
     debug: var=output
+
+- name: start vault server
+    shell: /home/dominic/VaultServer/Vault/vault server init
+    register: output2
+
+  - name: Show output2
+    debug: var=output2
