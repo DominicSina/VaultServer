@@ -18,6 +18,7 @@
     git:
       repo: https://github.com/DominicSina/VaultServer.git
       dest: /home/dominic/VaultServer
+      version: basicDeploymentScript
 
   # Only available to a registered user, not useful for following ansible shell module.
   # Still nice to have for local debugging on the target machines.
