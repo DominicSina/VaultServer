@@ -42,10 +42,10 @@
     sudo: yes
 
   - name: start vault server
-    shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl & #doesnt work but other forks might work
-    #shell: /home/dominic/VaultServer/Vault/vault server -config=config.hcl
-    #async: 60 #insert large number, VERY UGLY but https://github.com/ansible/ansible/issues/4778 suggests this
-    #poll: 0
+    #shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl & #doesnt work but other forks might work
+    shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl
+    async: 60 #insert large number, VERY UGLY but https://github.com/ansible/ansible/issues/4778 suggests this
+    poll: 0
     register: output
 
   - name: Show output
