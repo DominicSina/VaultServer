@@ -35,23 +35,27 @@
 
   # Used to start server on linux systems. Memlocks should be turned on when
   # nonencrypted swaps are performed https://www.vaultproject.io/docs/configuration/index.html 
-  - name: Enable memlock syscall for vault 
-    shell: setcap cap_ipc_lock=+ep $(readlink -f $(which vault))
+  - capabilities: 
+      path: /home/dominic/VaultServer/Vault/vault
+      capability: cap_ipc_lock=+ep
+      state: present
     sudo: yes
 
   - name: start vault server
-    #shell: /home/dominic/VaultServer/Vault/vault server -dev & #doesnt work but other forks might work
-    shell: /home/dominic/VaultServer/Vault/vault server config=config.hcl
-    async: 60 #insert large number, VERY UGLY but https://github.com/ansible/ansible/issues/4778 suggests this
-    poll: 0
+    shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl & #doesnt work but other forks might work
+    #shell: /home/dominic/VaultServer/Vault/vault server -config=config.hcl
+    #async: 60 #insert large number, VERY UGLY but https://github.com/ansible/ansible/issues/4778 suggests this
+    #poll: 0
     register: output
 
   - name: Show output
     debug: var=output
 
-- name: start vault server
-    shell: /home/dominic/VaultServer/Vault/vault server init
+  - name: Initialize vault
+    shell: /home/dominic/VaultServer/Vault/vault init
     register: output2
-
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+      
   - name: Show output2
     debug: var=output2
