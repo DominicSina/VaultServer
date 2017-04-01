@@ -1,4 +1,4 @@
-storage "file" {
+backend "file" {
   path = "/home/dominic/VaultServer/Vault/data"
 }
 
