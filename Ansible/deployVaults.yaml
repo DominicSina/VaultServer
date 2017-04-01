@@ -7,14 +7,14 @@
     local_home: "{{ lookup('env','HOME') }}"
 
   tasks:
-  - name: Install packages
+  - name: install git
     apt:
       pkg: git
       update_cache: yes
       state: latest
     sudo: yes
 
-  - name: Get repo from github
+  - name: get repo from github
     git:
       repo: https://github.com/DominicSina/VaultServer.git
       dest: /home/dominic/VaultServer
@@ -22,19 +22,19 @@
 
   # Only available to a registered user, not useful for following ansible shell module.
   # Still nice to have for local debugging on the target machines.
-  - name: Add vault binary to PATH 
+  - name: add vault binary to PATH in bashrc 
     lineinfile:
       dest: ~/.bashrc
       line: 'export PATH="$PATH:$HOME/VaultServer/Vault" # Adds vault binary to PATH'
 
   # Similar to task above. Specifies to access local vault server through http using bash.
-  - name: Set local vault server to be accessed through http
+  - name: add local vault server address in bashrc
     lineinfile:
       dest: ~/.bashrc
       line: 'export VAULT_ADDR="http://127.0.0.1:8200" # Adds local vault server address to bash'
 
-  # Used to start server on linux systems. Memlocks should be turned on when
-  # nonencrypted swaps are performed https://www.vaultproject.io/docs/configuration/index.html 
+  # Memlock is needed for vault in linux systems. Vault needs memlock capabilites when
+  # nonencrypted swaps are performed https://www.vaultproject.io/docs/configuration/index.html
   - capabilities: 
       path: /home/dominic/VaultServer/Vault/vault
       capability: cap_ipc_lock=+ep
@@ -46,16 +46,21 @@
     shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl
     async: 60 #insert large number, VERY UGLY but https://github.com/ansible/ansible/issues/4778 suggests this
     poll: 0
-    register: output
+    register: server_output
 
-  - name: Show output
-    debug: var=output
+  - name: show server output
+    debug: var=server_output
 
-  - name: Initialize vault
+  - name: remove previous vault
+    file:
+      state: absent
+      path: /home/dominic/VaultServer/Vault/data/
+
+  - name: initialize vault
     shell: /home/dominic/VaultServer/Vault/vault init
-    register: output2
+    register: vault_init_output
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"
       
-  - name: Show output2
-    debug: var=output2
+  - name: show vault init output
+    debug: var=vault_init_output
