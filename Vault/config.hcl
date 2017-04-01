@@ -1,4 +1,5 @@
-backend "inmem" {
+storage "file" {
+  path = "/home/dominic/VaultServer/Vault/data"
 }
 
 listener "tcp" {
