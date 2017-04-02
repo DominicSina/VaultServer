@@ -33,7 +33,7 @@
     command: openssl req -newkey rsa:1024 -nodes -out /home/dominic/VaultServer/Vault/Secrets/vault.csr -keyout /home/dominic/VaultServer/Vault/Secrets/vault.key -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
 
   - name: create crt
-    command: openssl ca -batch -config /home/dominic/VaultServer/Vault/Secrets/vault-ca.conf -notext -in /home/dominic/VaultServer/Vault/Secrets/vault.csr -out /home/dominic/VaultServer/Vault/Secrets/vault.crt
+    command: openssl ca -batch -config /home/dominic/VaultServer/Vault/TLS/vault-ca.conf -notext -in /home/dominic/VaultServer/Vault/Secrets/vault.csr -out /home/dominic/VaultServer/Vault/Secrets/vault.crt
 
   # Only available to a registered user, not useful for following ansible shell module.
   # Still nice to have for local debugging on the target machines.
