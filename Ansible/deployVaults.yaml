@@ -18,7 +18,7 @@
     git:
       repo: https://github.com/DominicSina/VaultServer.git
       dest: /home/dominic/VaultServer
-      version: basicDeploymentScript
+      version: remoteAccess
 
   - name: create secrets folder
     file:
@@ -28,7 +28,10 @@
   - name: create ca
     command: openssl req -newkey rsa:2048 -keyout /home/dominic/VaultServer/Vault/Secrets/privkey.pem -days 3650 -x509 -nodes -out /home/dominic/VaultServer/Vault/Secrets/root.cer -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
 
-  - name: create ca conf
+  - name: create csr
+    command: openssl req -newkey rsa:1024 -nodes -out /home/dominic/VaultServer/Vault/Secrets/vault.csr -keyout /home/dominic/VaultServer/Vault/Secrets/vault.key -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
+
+  - name: create crt
     command: openssl ca -batch -config /home/dominic/VaultServer/Vault/Secrets/vault-ca.conf -notext -in /home/dominic/VaultServer/Vault/Secrets/vault.csr -out /home/dominic/VaultServer/Vault/Secrets/vault.crt
 
   # Only available to a registered user, not useful for following ansible shell module.
