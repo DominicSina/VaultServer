@@ -19,6 +19,7 @@
       repo: https://github.com/DominicSina/VaultServer.git
       dest: /home/dominic/VaultServer
       version: remoteAccess
+      force: yes
 
   - name: create secrets folder
     file:
