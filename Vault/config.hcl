@@ -8,7 +8,7 @@ listener "tcp" {
 }
 
 listener "tcp" {
- address = "0.0.0.0:8200"
+ address = "192.168.2.1:8200"
  tls_cert_file = "/home/dominic/VaultServer/Vault/Secrets/vault.crt"
  tls_key_file = "/home/dominic/VaultServer/Vault/Secrets/vault.key"
 }
