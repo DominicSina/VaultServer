@@ -1,0 +1,26 @@
+---
+- hosts: vaultdevservers
+  remote_user: dominic
+  connection: ssh
+
+  vars:
+    root_token: "{{ root_token }}"
+
+  tasks:
+  - name: vault status 
+    shell: ls
+
+  - name: auth with root token
+    command: /home/dominic/VaultServer/Vault/vault auth {{ root_token }}
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    
+  - name: enable userpass authentication
+    command: /home/dominic/VaultServer/Vault/vault auth-enable userpass
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    
+  - name: create new user
+    command: /home/dominic/VaultServer/Vault/vault write auth/userpass/users/user password=pw
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
