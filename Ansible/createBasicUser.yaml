@@ -21,6 +21,6 @@
       VAULT_ADDR: "http://127.0.0.1:8200"
     
   - name: create new user
-    command: /home/dominic/VaultServer/Vault/vault write auth/userpass/users/user password=pw
+    command: /home/dominic/VaultServer/Vault/vault write auth/userpass/users/user password=pw policies=/home/dominic/VaultServer/Vault/Policies/readPolicy.hcl
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"
