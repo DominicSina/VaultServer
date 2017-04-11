@@ -56,12 +56,19 @@
       state: present
     sudo: yes
 
-  - name: start vault server
+  #- name: start vault server
     #shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl & #doesnt work but other forks might work
-    shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl
-    async: 60 #insert large number, VERY UGLY but https://github.com/ansible/ansible/issues/4778 suggests this
-    poll: 0
-    register: server_output
+  #  shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl
+  #  async: 60 #insert large number, VERY UGLY but https://github.com/ansible/ansible/issues/4778 suggests this
+  #  poll: 0
+  #  register: server_output
+
+  - name: start vault server
+    service:
+      name: Vault
+      state: started
+      args: /home/dominic/VaultServer/Vault/upstartVault.conf
+
 
   - name: show server output
     debug: var=server_output
