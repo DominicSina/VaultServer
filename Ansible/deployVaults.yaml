@@ -13,13 +13,18 @@
       update_cache: yes
       state: latest
     sudo: yes
+    #register: gitInstallResult
+    #ignore_errors: True
 
   - name: get repo from github
     git:
       repo: https://github.com/DominicSina/VaultServer.git
       dest: /home/dominic/VaultServer
       version: improvedAnsibleScript
+      update: yes
       force: yes
+    #register: gitPullResult
+    #ignore_errors: True
 
   - name: create secrets folder
     file:
@@ -56,6 +61,14 @@
       state: present
     sudo: yes
 
+  - name: copy service file
+    command: cp /home/dominic/VaultServer/Vault/vault.service /etc/systemd/system/
+    sudo: yes
+
+  - name: set permissions of service file
+    command: chmod 664 /etc/systemd/system/vault.service
+    sudo: yes
+
   #- name: start vault server
     #shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl & #doesnt work but other forks might work
   #  shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl
@@ -67,7 +80,7 @@
     service:
       name: Vault
       state: started
-      args: /home/dominic/VaultServer/Vault/upstartVault.conf
+      #args: /home/dominic/VaultServer/Vault/upstartVault.conf
 
 
   - name: show server output

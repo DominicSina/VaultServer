@@ -1,0 +1,6 @@
+[Unit]
+Description=Vault server
+
+[Service]
+Type=simple
+ExecStart=/home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl
