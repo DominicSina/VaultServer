@@ -13,8 +13,8 @@
       update_cache: yes
       state: latest
     sudo: yes
-    #register: gitInstallResult
-    #ignore_errors: True
+    register: gitInstallResult
+    ignore_errors: True
 
   - name: get repo from github
     git:
@@ -23,13 +23,14 @@
       version: improvedAnsibleScript
       update: yes
       force: yes
-    #register: gitPullResult
-    #ignore_errors: True
+    register: gitPullResult
+    ignore_errors: True #is possible update part of deployment?
 
-  - name: create secrets folder
+  - name: make sure secrets folder exists
     file:
       state: directory
       path: /home/dominic/VaultServer/Vault/Secrets
+    when: gitPullResult|changed
 
   - name: create ca
     command: openssl req -newkey rsa:2048 -keyout /home/dominic/VaultServer/Vault/Secrets/privkey.pem -days 3650 -x509 -nodes -out /home/dominic/VaultServer/Vault/Secrets/root.cer -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
@@ -68,20 +69,6 @@
   - name: set permissions of service file
     command: chmod 664 /etc/systemd/system/vault.service
     sudo: yes
-
-  #- name: start vault server
-    #shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl & #doesnt work but other forks might work
-  #  shell: /home/dominic/VaultServer/Vault/vault server -config=/home/dominic/VaultServer/Vault/config.hcl
-  #  async: 60 #insert large number, VERY UGLY but https://github.com/ansible/ansible/issues/4778 suggests this
-  #  poll: 0
-  #  register: server_output
-
-  #- name: start vault server
-  #  service:
-  #    name: vault.service
-  #    state: started
-  #  sudo: yes
-  #    #args: /home/dominic/VaultServer/Vault/upstartVault.conf
 
   - name: start vault server
     systemd:
