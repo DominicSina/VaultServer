@@ -76,12 +76,20 @@
   #  poll: 0
   #  register: server_output
 
-  - name: start vault server
-    service:
-      name: Vault
-      state: started
-      #args: /home/dominic/VaultServer/Vault/upstartVault.conf
+  #- name: start vault server
+  #  service:
+  #    name: vault.service
+  #    state: started
+  #  sudo: yes
+  #    #args: /home/dominic/VaultServer/Vault/upstartVault.conf
 
+  - name: start vault server
+    systemd:
+      name: vault.service
+      daemon_reload: yes
+      enabled: no
+      state: started
+    sudo: yes
 
   - name: show server output
     debug: var=server_output
@@ -90,6 +98,7 @@
     file:
       state: absent
       path: /home/dominic/VaultServer/Vault/data/
+    sudo: yes
 
   - name: initialize vault
     shell: /home/dominic/VaultServer/Vault/vault init
