@@ -41,3 +41,4 @@ Thumbs.db
 ############
 /Vault/data
 /Vault/Secrets
+/Vault/TLS
