@@ -41,6 +41,14 @@
   - name: create crt
     command: openssl ca -batch -config /home/dominic/VaultServer/Vault/TLS/vault-ca.conf -notext -in /home/dominic/VaultServer/Vault/Secrets/vault.csr -out /home/dominic/VaultServer/Vault/Secrets/vault.crt
 
+  - name: Let git assume TLS files are unchanged
+    command: git update-index --assume-unchanged Vault/TLS/{{ item }}
+    with_items:
+    - certindex
+    - serialfile
+    args:
+      chdir: /home/dominic/VaultServer
+
   # Only available to a registered user, not useful for following ansible shell module.
   # Still nice to have for local debugging on the target machines.
   - name: add vault binary to PATH in bashrc 
