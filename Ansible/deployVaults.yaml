@@ -7,6 +7,9 @@
     local_home: "{{ lookup('env','HOME') }}"
 
   tasks:
+
+  # Pull from github #
+  ####################
   - name: install git
     apt:
       pkg: git
@@ -24,31 +27,39 @@
       update: yes
       force: yes
     register: gitPullResult
-    ignore_errors: True #is possible update part of deployment?
+    ignore_errors: True
 
+  # Handle certificate creation #
+  ###############################
   - name: make sure secrets folder exists
     file:
       state: directory
       path: /home/dominic/VaultServer/Vault/Secrets
-    when: gitPullResult|changed
+    register: secretsGenResult
 
   - name: create ca
     command: openssl req -newkey rsa:2048 -keyout /home/dominic/VaultServer/Vault/Secrets/privkey.pem -days 3650 -x509 -nodes -out /home/dominic/VaultServer/Vault/Secrets/root.cer -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
+    when: secretsGenResult|changed
 
   - name: create csr
     command: openssl req -newkey rsa:1024 -nodes -out /home/dominic/VaultServer/Vault/Secrets/vault.csr -keyout /home/dominic/VaultServer/Vault/Secrets/vault.key -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
+    when: secretsGenResult|changed
 
   - name: create crt
     command: openssl ca -batch -config /home/dominic/VaultServer/Vault/TLS/vault-ca.conf -notext -in /home/dominic/VaultServer/Vault/Secrets/vault.csr -out /home/dominic/VaultServer/Vault/Secrets/vault.crt
+    when: secretsGenResult|changed
 
   - name: Let git assume TLS files are unchanged
     command: git update-index --assume-unchanged Vault/TLS/{{ item }}
+    when: secretsGenResult|changed
     with_items:
     - certindex
     - serialfile
     args:
       chdir: /home/dominic/VaultServer
 
+  # Some stuff to help with local debugging #
+  ###########################################
   # Only available to a registered user, not useful for following ansible shell module.
   # Still nice to have for local debugging on the target machines.
   - name: add vault binary to PATH in bashrc 
@@ -62,6 +73,8 @@
       dest: ~/.bashrc
       line: 'export VAULT_ADDR="http://127.0.0.1:8200" # Adds local vault server address to bash'
 
+  # Configure run options and start vault service #
+  #################################################
   # Memlock is needed for vault in linux systems. Vault needs memlock capabilites when
   # nonencrypted swaps are performed https://www.vaultproject.io/docs/configuration/index.html
   - capabilities: 
@@ -72,13 +85,26 @@
 
   - name: copy service file
     command: cp /home/dominic/VaultServer/Vault/vault.service /etc/systemd/system/
+    when: gitPullResult|changed
     sudo: yes
 
   - name: set permissions of service file
-    command: chmod 664 /etc/systemd/system/vault.service
+    file: 
+      path: /etc/systemd/system/vault.service
+      mode: 0664 
     sudo: yes
 
-  - name: start vault server
+  - name: restart vault server
+    systemd:
+      name: vault.service
+      daemon_reload: yes
+      enabled: no
+      state: restarted
+    when: gitPullResult|changed or secretsGenResult|changed
+    sudo: yes
+
+
+  - name: make sure vault server runs
     systemd:
       name: vault.service
       daemon_reload: yes
@@ -86,20 +112,21 @@
       state: started
     sudo: yes
 
-  - name: show server output
-    debug: var=server_output
-
-  - name: remove previous vault
+  # Initialize vault #
+  ####################
+  - name: check if vault was initialized
     file:
-      state: absent
+      state: directory
       path: /home/dominic/VaultServer/Vault/data/
-    sudo: yes
+    register: initCheckResult
 
   - name: initialize vault
     shell: /home/dominic/VaultServer/Vault/vault init
+    when: initCheckResult|changed
     register: vault_init_output
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"
       
   - name: show vault init output
+    when: initCheckResult|changed
     debug: var=vault_init_output
