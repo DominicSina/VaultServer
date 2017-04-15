@@ -28,6 +28,7 @@
       force: yes
     register: gitPullResult
     ignore_errors: True
+    sudo: yes
 
   # Handle certificate creation #
   ###############################
@@ -36,18 +37,22 @@
       state: directory
       path: /opt/VaultServer/Vault/Secrets
     register: secretsGenResult
+    sudo: yes
 
   - name: create ca
     command: openssl req -newkey rsa:2048 -keyout /opt/VaultServer/Vault/Secrets/privkey.pem -days 3650 -x509 -nodes -out /opt/VaultServer/Vault/Secrets/root.cer -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
     when: secretsGenResult|changed
+    sudo: yes
 
   - name: create csr
     command: openssl req -newkey rsa:1024 -nodes -out /opt/VaultServer/Vault/Secrets/vault.csr -keyout /opt/VaultServer/Vault/Secrets/vault.key -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
     when: secretsGenResult|changed
+    sudo: yes
 
   - name: create crt
     command: openssl ca -batch -config /opt/VaultServer/Vault/TLS/vault-ca.conf -notext -in /opt/VaultServer/Vault/Secrets/vault.csr -out /opt/VaultServer/Vault/Secrets/vault.crt
     when: secretsGenResult|changed
+    sudo: yes
 
   - name: Let git assume TLS files are unchanged
     command: git update-index --assume-unchanged Vault/TLS/{{ item }}
@@ -57,6 +62,7 @@
     - serialfile
     args:
       chdir: /opt/VaultServer
+    sudo: yes
 
   # Some stuff to help with local debugging #
   ###########################################
@@ -119,6 +125,7 @@
       state: directory
       path: /opt/VaultServer/Vault/data/
     register: initCheckResult
+    sudo: yes
 
   - name: initialize vault
     shell: /opt/VaultServer/Vault/vault init
