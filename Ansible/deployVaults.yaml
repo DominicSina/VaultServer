@@ -71,7 +71,7 @@
   - name: add vault binary to PATH in bashrc 
     lineinfile:
       dest: ~/.bashrc
-      line: 'export PATH="$PATH:$HOME/VaultServer/Vault" # Adds vault binary to PATH'
+      line: 'export PATH="/opt/VaultServer/Vault" # Adds vault binary to PATH'
 
   # Similar to task above. Specifies to access local vault server through http using bash.
   - name: add local vault server address in bashrc
