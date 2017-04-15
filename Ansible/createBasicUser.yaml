@@ -8,21 +8,21 @@
 
   tasks:
   - name: auth with root token
-    command: /home/dominic/VaultServer/Vault/vault auth {{ root_token }}
+    command: /opt/VaultServer/Vault/vault auth {{ root_token }}
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"
     
   - name: enable userpass authentication
-    command: /home/dominic/VaultServer/Vault/vault auth-enable userpass
+    command: /opt/VaultServer/Vault/vault auth-enable userpass
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"
     
   - name: create example policy
-    command: /home/dominic/VaultServer/Vault/vault policy-write secrets-readonly /home/dominic/VaultServer/Vault/Policies/readPolicy.hcl
+    command: /opt/VaultServer/Vault/vault policy-write secrets-readonly /opt/VaultServer/Vault/Policies/readPolicy.hcl
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"
 
   - name: create new user
-    command: /home/dominic/VaultServer/Vault/vault write auth/userpass/users/user password=pw policies=secrets-readonly
+    command: /opt/VaultServer/Vault/vault write auth/userpass/users/user password=pw policies=secrets-readonly
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"

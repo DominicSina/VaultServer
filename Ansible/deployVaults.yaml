@@ -22,7 +22,7 @@
   - name: get repo from github
     git:
       repo: https://github.com/DominicSina/VaultServer.git
-      dest: /home/dominic/VaultServer
+      dest: /opt/VaultServer
       version: improvedAnsibleScript
       update: yes
       force: yes
@@ -34,19 +34,19 @@
   - name: make sure secrets folder exists
     file:
       state: directory
-      path: /home/dominic/VaultServer/Vault/Secrets
+      path: /opt/VaultServer/Vault/Secrets
     register: secretsGenResult
 
   - name: create ca
-    command: openssl req -newkey rsa:2048 -keyout /home/dominic/VaultServer/Vault/Secrets/privkey.pem -days 3650 -x509 -nodes -out /home/dominic/VaultServer/Vault/Secrets/root.cer -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
+    command: openssl req -newkey rsa:2048 -keyout /opt/VaultServer/Vault/Secrets/privkey.pem -days 3650 -x509 -nodes -out /opt/VaultServer/Vault/Secrets/root.cer -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
     when: secretsGenResult|changed
 
   - name: create csr
-    command: openssl req -newkey rsa:1024 -nodes -out /home/dominic/VaultServer/Vault/Secrets/vault.csr -keyout /home/dominic/VaultServer/Vault/Secrets/vault.key -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
+    command: openssl req -newkey rsa:1024 -nodes -out /opt/VaultServer/Vault/Secrets/vault.csr -keyout /opt/VaultServer/Vault/Secrets/vault.key -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=DevCA"
     when: secretsGenResult|changed
 
   - name: create crt
-    command: openssl ca -batch -config /home/dominic/VaultServer/Vault/TLS/vault-ca.conf -notext -in /home/dominic/VaultServer/Vault/Secrets/vault.csr -out /home/dominic/VaultServer/Vault/Secrets/vault.crt
+    command: openssl ca -batch -config /opt/VaultServer/Vault/TLS/vault-ca.conf -notext -in /opt/VaultServer/Vault/Secrets/vault.csr -out /opt/VaultServer/Vault/Secrets/vault.crt
     when: secretsGenResult|changed
 
   - name: Let git assume TLS files are unchanged
@@ -56,7 +56,7 @@
     - certindex
     - serialfile
     args:
-      chdir: /home/dominic/VaultServer
+      chdir: /opt/VaultServer
 
   # Some stuff to help with local debugging #
   ###########################################
@@ -78,13 +78,13 @@
   # Memlock is needed for vault in linux systems. Vault needs memlock capabilites when
   # nonencrypted swaps are performed https://www.vaultproject.io/docs/configuration/index.html
   - capabilities: 
-      path: /home/dominic/VaultServer/Vault/vault
+      path: /opt/VaultServer/Vault/vault
       capability: cap_ipc_lock=+ep
       state: present
     sudo: yes
 
   - name: copy service file
-    command: cp /home/dominic/VaultServer/Vault/vault.service /etc/systemd/system/
+    command: cp /opt/VaultServer/Vault/vault.service /etc/systemd/system/
     when: gitPullResult|changed
     sudo: yes
 
@@ -117,11 +117,11 @@
   - name: check if vault was initialized
     file:
       state: directory
-      path: /home/dominic/VaultServer/Vault/data/
+      path: /opt/VaultServer/Vault/data/
     register: initCheckResult
 
   - name: initialize vault
-    shell: /home/dominic/VaultServer/Vault/vault init
+    shell: /opt/VaultServer/Vault/vault init
     when: initCheckResult|changed
     register: vault_init_output
     environment:
