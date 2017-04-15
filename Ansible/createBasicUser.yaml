@@ -11,9 +11,16 @@
     command: /opt/VaultServer/Vault/vault auth {{ root_token }}
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"
-    
+  
+  - name: list auth backends
+    command: /opt/VaultServer/Vault/vault read sys/auth
+    register: enabledAuthBackends 
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+
   - name: enable userpass authentication
     command: /opt/VaultServer/Vault/vault auth-enable userpass
+    when: " ( 'userpass' not in enabledAuthBackends.stdout ) "
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"
     
