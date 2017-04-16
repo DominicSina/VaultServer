@@ -26,11 +26,11 @@
       VAULT_ADDR: "http://127.0.0.1:8200"
     
   - name: create example policy
-    command: /opt/VaultServer/Vault/vault policy-write secrets-readonly /opt/VaultServer/Vault/Policies/readPolicy.hcl
+    command: /opt/VaultServer/Vault/vault policy-write basicUserPolicy /opt/VaultServer/Vault/Policies/basicUserPolicy.hcl
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"
 
   - name: create new user
-    command: /opt/VaultServer/Vault/vault write auth/userpass/users/user password=pw policies=secrets-readonly
+    command: /opt/VaultServer/Vault/vault write auth/userpass/users/user password=pw policies=basicUserPolicy
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"
