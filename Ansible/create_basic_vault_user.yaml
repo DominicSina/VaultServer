@@ -1,7 +1,8 @@
 ---
 - hosts: vaultdevserver
   remote_user: dominic
-  connection: ssh
+  roles: 
+    - vaultserver
 
   vars:
     root_token: "{{ root_token }}"

@@ -14,5 +14,4 @@ Enter the password for your remote user when prompted
 To create a basic user first unseal your vault and
 then run: 
 
-ansible-playbook -i hosts createBasicUser.yaml --extra-vars "root_token=[root_token_received_during_vault_deployment]"
-
+ansible-playbook -i hosts create_basic_vault_user.yaml --extra-vars "root_token=[root_token_received_during_initialization]" -K
