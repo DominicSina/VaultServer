@@ -1,13 +1,4 @@
 ---
-- hosts: vaultdevservers
-  remote_user: dominic
-  connection: ssh
-
-  vars:
-    local_home: "{{ lookup('env','HOME') }}"
-
-  tasks:
-
   # Pull from github #
   ####################
   - name: install git

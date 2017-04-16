@@ -1,5 +1,5 @@
 ---
-- hosts: vaultdevservers
+- hosts: vaultdevserver
   remote_user: dominic
   connection: ssh
 

@@ -1,0 +1,5 @@
+---
+ - hosts: vaultdevserver
+   remote_user: dominic
+   roles: 
+     - vaultserver
